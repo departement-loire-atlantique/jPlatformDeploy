@@ -1,0 +1,30 @@
+env:
+  global:
+  - secure: M/RT26ubxsP1EiJfb8hYHj/QOwa/MP8E86H1ifSORlFiy51Zp/2XadqdgsPQpNhwncnJuPcqWt4LvCXPm7NNfObqFyvmyhsB3Q7Ulk7prDjtJNw8+ARYnEM1n54FcR2FwWzs8hUJ0oS7d+Xu65KWz6bYRWKiPSXHqiREpNfYQnzGXEX1bg9JdXBeQTuOw6jJ4mZt0ab2FwKv4wG/S40s9uBEg8PIvJDsuGBfA3kGXj8MDpU1WX7YwPIXTzkpyWFe6P5V/gIfNDyFg+D0/gaFfma9NCCuvcsBV3TY9iFDUmIjL3OMLCCfbNVt2zYlT9S07e66RAxw4+yJnQ+RM21bM1IgEsu6qjp+eDsQdVPprV73sDY4msfBjIRCTxH8rm4G+WAK1GyRqnysWkGPpwwttfNMkxwnHIL1ZAfeYvd73y1hfNv0TTurjeuxQGWqi7ff3Jt1P56h2heat5C1iC3mwO7nrbMG1+dy0tOtsGckokTSUFnm8HlYo0wzlxYHg/zBpA+UTZkUkbk9zJdlcrcrzu1DODstvAZpqui6LQzS/c5mWWHGafGqmasDLwt/Qi/4bHxI7OTxA6D6MSnJQF5XhMiNw10HIbHQXHvQBFwcnJdYmCo62g+9RjCS+pEr/zVVZpL88ruDZ1cs4XONwXK10sq3DI54qQZn+jSRHGfzrk0=
+  - secure: UixnsXRYdAtmb9yYOlKf/aideYddcWk3/MwBS5gAQyI82qNcGKoiADyZVIBKtjhFREKm+SzwKEK/ua3r1+muFevFlGA5ZRp2b9As6v+JyVHrRGueA0BPhWRdnQt7cSvvSXLj95NbPdLFt0pe0XGmjuF8I7NdkXseWMEQWxsOFofPB2dkJViBYLtEonOai2DKFJH7s22Ea3kPkdsRM4jhvRe8xE0WRiEzPrQGxRSLNH7D5r+eMruxqtpIwTgHcu6Ru6LbOqYUQHf1SOLmZm/0MCu+0TOtazs3aRAL3eKAHgotQ2V4TGt6/dEqG8z8bkVhUvJalads9K2GNLQMgrIm/w3j+B2HO8aT2eVRW0rIaW5pfeA4Ki/NXcOflYEPPxVZSb+L3g9r9ti+Jy+04TMxkNmByCpSpOJfHBG0vfAyANVmQxF21Xrm1lxeRUuI5v42t04ZBG9TcCgydyb1zMzdmpr5Ai/Nk7XhzcITcAD6dlmToW1ArR9bgCvJN+hsOFlylmxFWv5ihxMzc6Qt2JNIFKXKKOzt+8Tpg+imqkgllDHMKdO7XyX0ya/wl0s+IalPUMznpZqmtQV/eMgp3IUIVHauyuO7XTKclmK/MI0FzzfnKM8Dnwi9fLuCsnGtJOcL72S0uDe65dt3a34Doo8ZpHMMl/QekZ8Pq8irRomQJdA=
+
+addons:
+  apt:
+    packages:
+      ant
+
+before_script:
+- git clone -b feature/makewar https://${GITHUB_USER}:${GITHUB_PASS}@github.com/departement-loire-atlantique/jPlatformBuild.git
+- cd ./jPlatformBuild/tools/jalios
+
+script:
+- ant makeWarSocle
+- cp -R ../dist ${TRAVIS_BUILD_DIR}
+- cd ${TRAVIS_BUILD_DIR}
+- export CODE_VERSION=`git describe`
+- mv ${TRAVIS_BUILD_DIR}/dist/socle.war ${TRAVIS_BUILD_DIR}/dist/socle-${CODE_VERSION}.war
+
+deploy:
+  provider: releases
+  api_key:
+    secure: 1+S8fNLSidR7oFifFRNLKs1ONyv3abaWxxWg55CDHMguT+OORmmvpm1uv79MNmpGstjOSBsUt8LidgpD6yJ2twrCb2HKyNSYdp75QtGYMx4F5y7Qa2bXTx0qh71NNc7Ow62IN3rJxqa/XscaS9OSNMkrgkIvRc6LMttC5przLAJq6u1ixXQqKiWbjSdK289yz5KbWijBI1ZP5IN258IXvtkvlxVvP0i4X7nlVmz/zw9s//gl+vj0qIbM1txzidnTjXdVw2OPZhosSSFXiUHsC8IXkEJrFiLcKNlYCNrhttbQL18yjy1JbwdTSAzeorVvGQyUny+UvK7A2SwXXo3rI3+kSSvRsV7zAalELd+HfyBYXsB+83RV2ElhH/KX0yNqVFpLf3oGDEpal5KCRJjZaag/wkFBRqACOPXHIdfx0lkx7E3Bz7DcPrM3IlsdlW065coM1p7MojC+kg+/qy3MpqnCEgkXv1HpVA4mXHJsWINSeBigcHT/vJTXE3O3P85keI++Hx6QXmj5sPmOXsigj6UYVrlUbbiqcUFzRNQLBZGr/pqbkQbhQV+7lLssjVnRl9MoWzh/4CL3NtVlhXGrlc6aqTfr3joA6lMXLJmcIH6TRfbTf198sfagvnqYgc0INDavcs1dbUFkNy2gV/ETNXlC+3rh7dYUwJ2xsMgisWU=
+  file_glob: true
+  file: "${TRAVIS_BUILD_DIR}/dist/*.war"
+  skip_cleanup: true
+  on:
+    tags: true

@@ -1,0 +1,26 @@
+env:
+  global:
+  - secure: zwr0MiUYDEh18rhVvxjj3jNlvyuy7yTYnY3Wj7dL+nbmYVY2GxJQOyV7JH7mcRrQsFz+udHM9nc6DhZFgdDaJNj+h2m+AHMlkiuGF/HiMZ/klUhRqWLjVKNtPkBDuG/PPa3xK+8Gp57WdGppess4m5eolW2TSbv1lredcWsWkkJUvxDbJsgHjJbhMMKpGuFN7UDulrgJnS+WoUo6pb9C6YjgyT85gkhC8HdBGSLFM1v8BI7sjCTdXnC5BFTUyAztwZyWosLJ8VbEcl+gsYkGfDp+biSLiLuE5avlUc2zx6v5c7KgVXlEt7aGkORasod8R0stmV8pIgUOzrqy/9GUE/1CJGVwauPxhgdRqDztC0dUww91yj27d6+TZ8hPml7dEgok7mAKmig0Exh5QMaa1qmiU1ybm51DpgV+vY356teCAjI36Ku9nd46UxK3FxaVonSp7wO+sfp9iK7BVzKc0LGESJYI64Fqram5HKOvf3AGCba0Bx/bChCjoN9aRLg0VcwP0Mr7Ki+89C7YCohLx15GkGz2M3sEvbNSepj/QNvQKD5lAJ9DKZa1ghFBLOX1Re6xjv/Ew7syg3yFyjg+hKZ+3Yjurbn0/I9lL4imoe13kRea8YI4wVDHPEo65Je/zG0lGXad+QN6MAikQt5ySmH68KFXC3R0oUJlrNuNyP0=
+  - secure: 2blvlrivdMiXpM+dsJVeP7zsBbBDM+tu4Y5Xu2T+NMYLzCDgPM60vEgoL5J410eRhjvRjPo2h9+6b5fiU5/5Q0Wc7HaNL/woxRSyKrJ6i1lvA1fDp9D7uY8ONi1P88WkFTt0nmmsyfNmIAfLL+McxpfS4OgKqGFIpxm5FfJ9aCcV1AK/QZBxWj03K285PXRhDlfhUMS83iKovQFCs+OBvHKuOWJAU85A04w370Ug5vlkx8gmmfAmCxRFItYcd3UnYhEdKjIUhMT/vG/4B3Dga/o6zmesAqeAZk6SLq5EEbsl72x8Brz9tzFLnI2MwzSGmW2JcjDHIbJZsgWD3FJB2lrLEB6bAgCQCW5sLRHkjYFsQzQcbRyevWCcszt9R7k250vnCM4rhQze/WEOayVlDZUm5+KfRWhI+IWDWXhAtkcATjL82UFHvYp63J7ZC3V2b2v88KkzQS+T0S96rh6xguHIg/HRQxmuc+c+l9AWN3Mcb8TLlhqQomWdd57zNFxNGP1oW709rCEGSARh2sDAsW5ZlvLRlzx1ABKA4wmdiMKz1xYUh879bBCIP1jVGDgS/2cKJP1cgxNBhFVEN4A3UT3uSM+VwAZC+MHSCfh1DSmz2Ux6GmSnzBpF60RzgFb3Xpeli59ZGuDIW3YMp9T/BWBKbFy8lrwv7DDJKMSLG6g=
+
+services:
+- docker
+
+before_script:
+- echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+- docker pull lbarro/jplatformbuild
+
+script:
+- docker run -v ${TRAVIS_BUILD_DIR}:/root/source --name buildimage -t lbarro/jplatformbuild ant makeWarSocle
+- docker cp buildimage:/root/dist .
+- export CODE_VERSION=`git describe`
+
+deploy:
+  provider: releases
+  api_key:
+    secure: 1+S8fNLSidR7oFifFRNLKs1ONyv3abaWxxWg55CDHMguT+OORmmvpm1uv79MNmpGstjOSBsUt8LidgpD6yJ2twrCb2HKyNSYdp75QtGYMx4F5y7Qa2bXTx0qh71NNc7Ow62IN3rJxqa/XscaS9OSNMkrgkIvRc6LMttC5przLAJq6u1ixXQqKiWbjSdK289yz5KbWijBI1ZP5IN258IXvtkvlxVvP0i4X7nlVmz/zw9s//gl+vj0qIbM1txzidnTjXdVw2OPZhosSSFXiUHsC8IXkEJrFiLcKNlYCNrhttbQL18yjy1JbwdTSAzeorVvGQyUny+UvK7A2SwXXo3rI3+kSSvRsV7zAalELd+HfyBYXsB+83RV2ElhH/KX0yNqVFpLf3oGDEpal5KCRJjZaag/wkFBRqACOPXHIdfx0lkx7E3Bz7DcPrM3IlsdlW065coM1p7MojC+kg+/qy3MpqnCEgkXv1HpVA4mXHJsWINSeBigcHT/vJTXE3O3P85keI++Hx6QXmj5sPmOXsigj6UYVrlUbbiqcUFzRNQLBZGr/pqbkQbhQV+7lLssjVnRl9MoWzh/4CL3NtVlhXGrlc6aqTfr3joA6lMXLJmcIH6TRfbTf198sfagvnqYgc0INDavcs1dbUFkNy2gV/ETNXlC+3rh7dYUwJ2xsMgisWU=
+  file_glob: true
+  file: "${TRAVIS_BUILD_DIR}/dist/*.war"
+  skip_cleanup: true
+  on:
+    tags: true
