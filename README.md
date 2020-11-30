@@ -1,8 +1,8 @@
 #jPlatformDeploy
 
 <p>
-  <a href="https://travis-ci.org/organizations/departement-loire-atlantique">
-    <img src="https://travis-ci.org/departement-loire-atlantique/jPlatformDeploy.svg?branch=master" />
+  <a href="https://travis-ci.com/github/departement-loire-atlantique/jPlatformDeploy">
+    <img src="https://travis-ci.com/departement-loire-atlantique/jPlatformDeploy.svg?branch=master" />
   </a>
 </p>
 
